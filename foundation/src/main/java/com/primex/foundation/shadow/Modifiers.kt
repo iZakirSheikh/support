@@ -66,7 +66,7 @@ fun Modifier.shadow(
     light: Color,
     dark: Color,
     elevation: Dp,
-    intensity: Float = 1.0f,
+    intensity: Float = Float.NaN,
     source: LightSource,
     border: BorderStroke? = null
 ): Modifier = composed {
@@ -108,12 +108,17 @@ fun Modifier.shadow(
     intensity: Float = Float.NaN,
     border: BorderStroke? = null
 ): Modifier {
+
+
+    val lightM = if (intensity.isNaN()) light else light.copy(intensity)
+    val darkM = if (intensity.isNaN()) dark else dark.copy(intensity)
+
     val shadow = when (offset) {
         Offset.Zero -> Modifier
         else -> ShadowModifierImpl(
             outline = outline,
-            light = light.copy(intensity),
-            dark = dark.copy(intensity),
+            light = light,
+            dark = dark,
             offset = offset,
             filter = filter,
             strokeWidth = strokeWidth
