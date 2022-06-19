@@ -3,47 +3,39 @@ package com.primex.accomplice
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.primex.accomplice.ui.theme.AccompliceTheme
-import com.primex.foundation.shadow.LightSource
-import com.primex.foundation.shadow.RoundedCornerOutline
-import com.primex.foundation.shadow.shadow
+import com.primex.core.rememberState
+import com.primex.core.shadow.SpotLight
+import com.primex.core.shadow.shadow
+import com.primex.ui.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AccompliceTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFFf2f2f2)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .requiredSize(100.dp)
-                            .shadow(
-                                outline = RoundedCornerOutline(12.dp),
-                                light = Color.White,
-                                dark = Color.Black.copy(0.1f),
-                                elevation = 10.dp,
-                                source = LightSource.TOP_LEFT,
-                                intensity = 0.1f
-                            )
-                            .background(color = Color(0xFFf2f2f2))
-                    )
-                }
+
             }
         }
     }
@@ -54,10 +46,28 @@ fun Greeting(name: String) {
     Text(text = "Hello $name!")
 }
 
-@Preview(showBackground = true)
+val bg = Color(0xffe0e0e0)
+
 @Composable
+@Preview(showBackground = true, backgroundColor = 0xffe0e0e0/* widthDp = 360, heightDp = 720*/)
 fun DefaultPreview() {
+
     AccompliceTheme {
-        Greeting("Android")
+        PreviewPerf()
     }
+}
+
+
+@Composable
+private fun PreviewPerf() {
+
+    SliderPreference(
+        title = "Color Secondary",
+        icon = Icons.Default.AddCircle,
+        summery = "Select your favourite secondary color.",
+        defaultValue = 0.2f,
+        onValueChange = {},
+        steps = 5,
+        iconChange = Icons.Default.Favorite
+    )
 }
