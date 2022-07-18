@@ -34,10 +34,10 @@ interface Result<T> {
         value class Processing(val what: Int = -1) : State
 
         /**
-         * @param what: can be anything like string message or some error code as per requirements of user
+         * @param message the message to be delivered on UI
          */
         @JvmInline
-        value class Error(val throwable: Throwable?) : State
+        value class Error(val message: Text?) : State
 
         object Empty : State
 
@@ -69,40 +69,4 @@ inline fun <T> buildResult(initial: T, init: MutableResult<T>.() -> Unit): Resul
     val result = MutableResult(initial)
     init.invoke(result)
     return result
-}
-
-fun <T> buildResultOfList(
-    initial: List<T>,
-    scope: CoroutineScope,
-    flow: Flow<List<T>>
-): Result<List<T>> {
-    return buildResult(initial) {
-        flow.onEach {
-            emit(it)
-            // change state to empty.
-            if (it.isEmpty()) {
-                emit(Result.State.Empty)
-            }
-        }
-            .catch { emit(Result.State.Error(it)) }
-            .launchIn(scope)
-    }
-}
-
-fun <K, T> buildResultOfMap(
-    initial: Map<K, T>,
-    scope: CoroutineScope,
-    flow: Flow<Map<K, T>>
-): Result<Map<K, T>> {
-    return buildResult(initial) {
-        flow.onEach {
-            emit(it)
-            // change state to empty.
-            if (it.isEmpty()) {
-                emit(Result.State.Empty)
-            }
-        }
-            .catch { emit(Result.State.Error(it)) }
-            .launchIn(scope)
-    }
 }

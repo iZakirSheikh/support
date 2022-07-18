@@ -84,6 +84,7 @@ fun Preference(
                 maxLines = if (singleLineTitle) 1 else 3,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(start = 16.dp)
             )
         }
 
@@ -96,7 +97,7 @@ fun Preference(
                         maxLines = 6,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
-                            .padding(top = 2.dp)
+                            .padding(top = 2.dp, start = 16.dp)
                             .fillMaxWidth(),
                     )
             }

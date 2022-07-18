@@ -44,7 +44,7 @@ fun BaseDialog(
     vectorIcon: ImageVector? = null,
     properties: DialogProperties = DialogProperties(),
     topBarBackgroundColor: Color = Color.Unspecified,
-    topBarContentColor: Color = suggestContentColorFor(backgroundColor = topBarBackgroundColor),
+    topBarContentColor: Color = contentColorFor(backgroundColor = topBarBackgroundColor),
     topBarElevation: Dp = 0.dp,
     actions: @Composable RowScope.() -> Unit = {},
     button1: @Composable (() -> Unit)? = null,
@@ -118,8 +118,8 @@ fun BaseDialog(
 private fun Title(title: String, subtitle: String?, modifier: Modifier = Modifier) {
     when (subtitle != null) {
         true -> Column(modifier = modifier) {
-            Header(text = title)
-            Label(text = subtitle)
+            Label(text = title)
+            Caption(text = subtitle)
         }
         else -> Header(text = title, modifier = modifier)
     }

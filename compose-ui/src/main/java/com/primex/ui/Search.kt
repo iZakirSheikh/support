@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -32,6 +33,7 @@ fun Search(
     shape: Shape = RoundedCornerShape(50),
     elevation: Dp = 4.dp,
     color: Color = MaterialTheme.colors.surface,
+    keyboardActions: KeyboardActions = KeyboardActions(),
     placeholder: String? = null,
     query: String,
     onQueryChanged: (query: String) -> Unit,
@@ -70,6 +72,7 @@ fun Search(
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                 }
             },
+            keyboardActions = keyboardActions
         )
 
         DisposableEffect(key1 = Unit) {

@@ -25,10 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
@@ -168,3 +166,103 @@ fun Caption(
     textAlign = textAlign,
     maxLines = maxLines
 )
+
+@Composable
+@NonRestartableComposable
+fun IconButton(
+    onClick: () -> Unit,
+    imageVector: ImageVector,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource
+    ) {
+        Icon(imageVector = imageVector, contentDescription = contentDescription, tint = tint)
+    }
+}
+
+
+@Composable
+@NonRestartableComposable
+fun IconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    bitmap: ImageBitmap,
+    contentDescription: String?,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource
+    ) {
+        Icon(bitmap = bitmap, contentDescription = contentDescription, tint = tint)
+    }
+}
+
+@Composable
+@NonRestartableComposable
+fun IconButton(
+    onClick: () -> Unit,
+    painter: Painter,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource
+    ) {
+        Icon(painter = painter, contentDescription = contentDescription, tint = tint)
+    }
+}
+
+
+@Composable
+@NonRestartableComposable
+fun ColoredOutlineButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = RoundedCornerShape(50),
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(
+        contentColor = MaterialTheme.colors.primary,
+        disabledContentColor = MaterialTheme.colors.primary.copy(ContentAlpha.disabled),
+        backgroundColor = Color.Transparent
+    ),
+    border: BorderStroke? = BorderStroke(
+        2.dp,
+        color = colors.contentColor(enabled = enabled).value
+    ),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        elevation = elevation,
+        shape = shape,
+        border = border,
+        colors = colors,
+        contentPadding = contentPadding,
+        content = content
+    )
+}

@@ -149,3 +149,8 @@ fun calculate(calculation: () -> Unit) {
     calculation.invoke()
 }
 
+
+inline fun <reified T> castTo(anything: Any): T {
+    return anything as T
+}
+
