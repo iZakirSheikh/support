@@ -178,7 +178,7 @@ private val String.asAnnotatedString
  */
 @Deprecated(
     "Use Text.collect", replaceWith = ReplaceWith(
-        "resolve", "com.primex.core.TextKt.getCollect"
+        "spannedResource(value = this)", "com.primex.core.TextKt.resolveResource"
     )
 )
 val Text.obtain: AnnotatedString
@@ -198,11 +198,13 @@ val Text.obtain: AnnotatedString
         }
 
 
-val Text.resolve: AnnotatedString
-    @Composable
-    @ReadOnlyComposable
-    @NonRestartableComposable
-    get() = obtain
+/**
+ * Resolves the resource to [AnnotatedString]
+ */
+@Composable
+@ReadOnlyComposable
+@NonRestartableComposable
+fun spannedResource(value: Text) = value.obtain
 
 /**
  * **Note: Doesn't support collecting [HtmlResource] Strings.

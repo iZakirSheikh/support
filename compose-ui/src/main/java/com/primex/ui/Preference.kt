@@ -68,8 +68,9 @@ fun Preference(
     val leading =
         @Composable {
             when {
-                icon != null -> Icon(imageVector = icon, contentDescription = null)
-                iconSpaceReserved -> Spacer(modifier = IconSpaceReservedModifier)
+                icon != null -> Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                iconSpaceReserved -> Spacer(modifier = IconSpaceReservedModifier.padding(end = 8.dp))
+                else -> Spacer(modifier = Modifier)
             }
         }
     val interactionSource: MutableInteractionSource = remember {
@@ -87,8 +88,7 @@ fun Preference(
                 text = title,
                 maxLines = if (singleLineTitle) 1 else 3,
                 overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 16.dp)
+                fontWeight = FontWeight.SemiBold
             )
         }
 
@@ -101,8 +101,7 @@ fun Preference(
                         maxLines = 6,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
-                            .padding(top = 2.dp, start = 16.dp)
-                            .fillMaxWidth(),
+                            .padding(top = 2.dp),
                     )
             }
         }
@@ -384,11 +383,11 @@ fun SliderPreference(
 
     val revealable =
         @Composable {
-            val startPadding = (if (iconSpaceReserved) 24.dp else 0.dp) + 8.dp
+            val startPadding = (if (iconSpaceReserved) 24.dp + 16.dp else 0.dp) + 8.dp
             Column(
                 modifier = Modifier
-                    .padding(start = startPadding)
                     .fillMaxWidth()
+                    .padding(start = startPadding)
             ) {
                 // place slider
                 var value by rememberState(initial = defaultValue)

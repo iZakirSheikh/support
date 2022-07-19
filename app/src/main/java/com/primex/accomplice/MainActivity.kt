@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import com.primex.accomplice.ui.theme.AccompliceTheme
 import com.primex.ui.SliderPreference
@@ -45,12 +46,13 @@ fun DefaultPreview() {
 private fun PreviewPerf() {
 
     SliderPreference(
-        title = "Color Secondary",
+        title = AnnotatedString("Color Secondary"),
         icon = Icons.Default.AddCircle,
-        summery = "Select your favourite secondary color.",
+        summery = AnnotatedString("Select your favourite secondary color."),
         defaultValue = 0.2f,
         onValueChange = {},
         steps = 5,
-        iconChange = Icons.Default.Favorite
+        iconChange = Icons.Default.Favorite,
+        iconSpaceReserved = false
     )
 }
