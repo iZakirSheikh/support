@@ -1,5 +1,6 @@
 package com.primex.ui
 
+import android.R
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -13,20 +14,23 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.primex.core.acquireFocusOnInteraction
 import com.primex.core.rememberState
-import android.R
-import androidx.compose.ui.draw.scale
 
 private val IconSpaceReservedModifier =
     Modifier
@@ -49,12 +53,12 @@ private val IconSpaceReservedModifier =
  */
 @Composable
 fun Preference(
-    title: String,
+    title: AnnotatedString,
     modifier: Modifier = Modifier,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: String? = null,
+    summery: AnnotatedString? = null,
     enabled: Boolean = true,
     widget: @Composable (() -> Unit)? = null,
     revealable: (@Composable () -> Unit)? = null,
@@ -134,7 +138,7 @@ fun Preference(
 
 @Composable
 fun SwitchPreference(
-    title: String,
+    title: AnnotatedString,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit),
     modifier: Modifier = Modifier,
@@ -142,7 +146,7 @@ fun SwitchPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: String? = null,
+    summery: AnnotatedString? = null,
 ) {
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
@@ -163,14 +167,14 @@ fun SwitchPreference(
 
 @Composable
 fun CheckBoxPreference(
-    title: String,
+    title: AnnotatedString,
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: String? = null,
+    summery: AnnotatedString? = null,
     onCheckedChange: ((Boolean) -> Unit)
 ) {
     Preference(
@@ -192,7 +196,7 @@ fun CheckBoxPreference(
 
 @Composable
 fun <T> DropDownPreference(
-    title: String,
+    title: AnnotatedString,
     defaultValue: T,
     onRequestChange: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -200,7 +204,7 @@ fun <T> DropDownPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    entries: List<Pair<String, T>>,
+    entries: List<Pair<AnnotatedString, T>>,
 ) {
     require(entries.isNotEmpty())
     var expanded by rememberState(initial = false)
@@ -266,7 +270,7 @@ fun <T> DropDownPreference(
 
 @Composable
 fun ColorPickerPreference(
-    title: String,
+    title: AnnotatedString,
     defaultEntry: Color,
     entries: List<Color>,
     onRequestValueChange: (Color) -> Unit,
@@ -275,7 +279,7 @@ fun ColorPickerPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: String? = null,
+    summery: AnnotatedString? = null,
     forceVisible: Boolean = false,
 ) {
     val widget =
@@ -363,7 +367,7 @@ private fun TextButtons(
 
 @Composable
 fun SliderPreference(
-    title: String,
+    title: AnnotatedString,
     defaultValue: Float,
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
@@ -372,7 +376,7 @@ fun SliderPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: String? = null,
+    summery: AnnotatedString? = null,
     forceVisible: Boolean = false,
     iconChange: ImageVector? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,

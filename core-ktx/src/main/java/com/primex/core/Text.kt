@@ -1,4 +1,4 @@
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "DEPRECATION")
 
 package com.primex.core
 
@@ -176,6 +176,11 @@ private val String.asAnnotatedString
 /**
  * Unpacks the text wrapper to result [AnnotatedString]
  */
+@Deprecated(
+    "Use Text.collect", replaceWith = ReplaceWith(
+        "resolve", "com.primex.core.TextKt.getCollect"
+    )
+)
 val Text.obtain: AnnotatedString
     @Composable
     @ReadOnlyComposable
@@ -193,6 +198,36 @@ val Text.obtain: AnnotatedString
         }
 
 
+val Text.resolve: AnnotatedString
+    @Composable
+    @ReadOnlyComposable
+    @NonRestartableComposable
+    get() = obtain
+
+/**
+ * **Note: Doesn't support collecting [HtmlResource] Strings.
+ * @param text: The [Text] to collect.
+ */
+fun Resources.resolve(text: Text): AnnotatedString =
+    when (text) {
+        is HtmlResource -> error("Not supported when collecting from Resource")
+        is PluralResource -> getQuantityString(text.id, text.quantity).asAnnotatedString
+        is PluralResource2 -> getQuantityString(
+            text.id,
+            text.quantity,
+            text.formatArgs
+        ).asAnnotatedString
+        is Raw -> text.value
+        is StringResource -> getString(text.id).asAnnotatedString
+        is StringResource2 -> getString(text.id, text.formatArgs).asAnnotatedString
+    }
+
+/**
+ * @see resolve
+ */
+@JvmName("resolve2")
+fun Resources.resolve(text: Text?): AnnotatedString? =
+    if (text == null) null else resolve(text)
 
 
 
