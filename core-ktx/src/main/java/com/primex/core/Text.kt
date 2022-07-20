@@ -177,7 +177,7 @@ private val String.asAnnotatedString
  * Unpacks the text wrapper to result [AnnotatedString]
  */
 @Deprecated(
-    "Use Text.collect", replaceWith = ReplaceWith(
+    "Use spannedResource", replaceWith = ReplaceWith(
         "spannedResource(value = this)", "com.primex.core.TextKt.resolveResource"
     )
 )

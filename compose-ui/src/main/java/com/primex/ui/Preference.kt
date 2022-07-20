@@ -35,7 +35,7 @@ import com.primex.core.rememberState
 private val IconSpaceReservedModifier =
     Modifier
         // .padding(start = 16.dp)
-        .requiredSize(24.dp)
+        .size(24.dp)
 
 /**
  * A General [Preference(title = )] representation.
@@ -68,8 +68,16 @@ fun Preference(
     val leading =
         @Composable {
             when {
-                icon != null -> Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                iconSpaceReserved -> Spacer(modifier = IconSpaceReservedModifier.padding(end = 8.dp))
+                icon != null -> Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                iconSpaceReserved -> Spacer(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .then(IconSpaceReservedModifier)
+                )
                 else -> Spacer(modifier = Modifier)
             }
         }
@@ -134,6 +142,35 @@ fun Preference(
         centreVertically = true
     )
 }
+
+
+@Composable
+fun Preference(
+    title: String,
+    modifier: Modifier = Modifier,
+    singleLineTitle: Boolean = true,
+    iconSpaceReserved: Boolean = true,
+    icon: ImageVector? = null,
+    summery: String? = null,
+    enabled: Boolean = true,
+    widget: @Composable (() -> Unit)? = null,
+    revealable: (@Composable () -> Unit)? = null,
+    forceVisible: Boolean = false,
+) {
+    Preference(
+        title = AnnotatedString(title),
+        modifier = modifier,
+        singleLineTitle = singleLineTitle,
+        iconSpaceReserved = iconSpaceReserved,
+        icon = icon,
+        summery = summery?.let { AnnotatedString(it) },
+        enabled = enabled,
+        widget = widget,
+        revealable = revealable,
+        forceVisible = forceVisible
+    )
+}
+
 
 @Composable
 fun SwitchPreference(
@@ -203,7 +240,7 @@ fun <T> DropDownPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    entries: List<Pair<AnnotatedString, T>>,
+    entries: List<Pair<String, T>>,
 ) {
     require(entries.isNotEmpty())
     var expanded by rememberState(initial = false)
@@ -261,7 +298,7 @@ fun <T> DropDownPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = default,
+        summery = AnnotatedString(default),
         widget = widget
     )
 }
