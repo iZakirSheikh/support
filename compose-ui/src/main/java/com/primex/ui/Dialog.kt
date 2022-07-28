@@ -121,7 +121,7 @@ private fun Title(title: String, subtitle: String?, modifier: Modifier = Modifie
             Label(text = title)
             Caption(text = subtitle)
         }
-        else -> Header(text = title, modifier = modifier)
+        else -> Label(text = title)
     }
 }
 
@@ -141,7 +141,7 @@ fun PrimeDialog(
     properties: DialogProperties = DialogProperties(),
     bottom: @Composable (() -> Unit)? = null,
     topBarBackgroundColor: Color = Color.Unspecified,
-    topBarContentColor: Color = suggestContentColorFor(backgroundColor = topBarBackgroundColor),
+    topBarContentColor: Color = contentColorFor(backgroundColor = topBarBackgroundColor),
     topBarElevation: Dp = 0.dp,
     imageButton: Pair<ImageVector, () -> Unit>? = null,
     button1: Pair<String, () -> Unit>? = null,
@@ -197,12 +197,18 @@ fun PrimeDialog(
 fun AlertDialog(
     title: String,
     message: String,
+    subtitle: String? =null,
     vectorIcon: ImageVector? = null,
+    topBarBackgroundColor: Color = Color.Unspecified,
+    topBarContentColor: Color = contentColorFor(backgroundColor = topBarBackgroundColor),
     onDismissRequest: (Boolean) -> Unit
 ) {
     PrimeDialog(
         title = title,
+        subtitle = subtitle,
         vectorIcon = vectorIcon,
+        topBarContentColor = topBarContentColor,
+        topBarBackgroundColor = topBarBackgroundColor,
         onDismissRequest = { onDismissRequest(false) },
         button2 = "Confirm" to { onDismissRequest(true) },
         button1 = "Dismiss" to { onDismissRequest(false) }) {
@@ -214,13 +220,15 @@ fun AlertDialog(
 
 @Composable
 fun TextInputDialog(
+    title: String,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     textFieldShape: Shape = RoundedCornerShape(50),
     defaultValue: String = "",
     label: String? = null,
     subtitle: String? = null,
+    topBarBackgroundColor: Color = Color.Unspecified,
+    topBarContentColor: Color = contentColorFor(backgroundColor = topBarBackgroundColor),
     vectorIcon: ImageVector? = null,
-    title: String,
     onDismissRequest: (String?) -> Unit,
 ) {
     var text by rememberState(
@@ -234,6 +242,8 @@ fun TextInputDialog(
         title = title,
         subtitle = subtitle,
         vectorIcon = vectorIcon,
+        topBarBackgroundColor = topBarBackgroundColor,
+        topBarContentColor = topBarContentColor,
         onDismissRequest = { onDismissRequest(null) },
         button1 = "Dismiss" to { onDismissRequest(null) },
         button2 = "Confirm" to { onDismissRequest(text.text) },

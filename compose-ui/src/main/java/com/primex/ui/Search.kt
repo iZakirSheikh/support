@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,12 +30,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Search(
     modifier: Modifier = Modifier,
-    onRequestClose: (() -> Unit)? = null,
     shape: Shape = RoundedCornerShape(50),
     elevation: Dp = 4.dp,
     color: Color = MaterialTheme.colors.surface,
-    keyboardActions: KeyboardActions = KeyboardActions(),
     placeholder: String? = null,
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    trailingIcon: @Composable (() -> Unit)? = null,
     query: String,
     onQueryChanged: (query: String) -> Unit,
 ) {
@@ -46,38 +47,23 @@ fun Search(
         elevation = elevation,
         color = color,
     ) {
-        val focusRequester = remember { FocusRequester() }
-
         TextField(
             value = query,
             onValueChange = onQueryChanged,
             modifier = Modifier
-                .focusRequester(focusRequester)
                 .fillMaxWidth()
                 .height(56.dp),
             placeholder = {
-                Crossfade(targetState = placeholder) {
-                    if (it != null)
-                        Text(text = it)
-                }
+                if (placeholder != null)
+                    Text(text = placeholder)
             },
-            /*  colors = TextFieldDefaults.textFieldColors(
-                  backgroundColor = Color.Transparent
-              ),*/
             leadingIcon = {
                 Icon(imageVector = Icons.Default.Search, contentDescription = null)
             },
-            trailingIcon = {
-                IconButton(onClick = { onRequestClose?.invoke() }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = null)
-                }
-            },
-            keyboardActions = keyboardActions
+            trailingIcon = trailingIcon,
+            keyboardActions = keyboardActions,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = androidx.compose.ui.text.input.ImeAction.Search)
         )
-
-        DisposableEffect(key1 = Unit) {
-            focusRequester.requestFocus()
-            onDispose { }
-        }
     }
+
 }
