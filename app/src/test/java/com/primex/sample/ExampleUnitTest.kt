@@ -1,4 +1,4 @@
-package com.primex.accomplice
+package com.primex.sample
 
 import org.junit.Test
 

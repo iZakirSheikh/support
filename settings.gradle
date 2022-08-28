@@ -13,7 +13,7 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "Accomplice"
+rootProject.name = "Support"
 include ':app'
 include ':core-ktx'
 include ':compose-ui'

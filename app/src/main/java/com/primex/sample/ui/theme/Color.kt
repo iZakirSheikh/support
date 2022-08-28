@@ -1,4 +1,4 @@
-package com.primex.accomplice.ui.theme
+package com.primex.sample.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.primex.accomplice
+package com.primex.sample
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import com.primex.accomplice.ui.theme.AccompliceTheme
+import com.primex.sample.ui.theme.SampleTheme
 import com.primex.ui.Preference
 import com.primex.ui.SliderPreference
 
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AccompliceTheme {
+            SampleTheme {
 
             }
         }
@@ -38,7 +38,7 @@ val bg = Color(0xffe0e0e0)
 @Preview(showBackground = true, backgroundColor = 0xffe0e0e1/* widthDp = 360, heightDp = 720*/)
 fun DefaultPreview() {
 
-    AccompliceTheme {
+    SampleTheme {
         PreviewPerf()
     }
 }

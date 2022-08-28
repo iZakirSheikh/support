@@ -1,4 +1,4 @@
-package com.primex.accomplice
+package com.primex.sample
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.primex.accomplice", appContext.packageName)
+        assertEquals("com.primex.sample", appContext.packageName)
     }
 }
