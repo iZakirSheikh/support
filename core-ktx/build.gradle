@@ -34,7 +34,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compiler_v
     }
     packagingOptions {
         resources {
@@ -61,7 +61,7 @@ afterEvaluate {
                 from components.release
 
                 // You can then customize attributes of the publication as shown below.
-                groupId = 'com.primex.accomplice'
+                groupId = 'com.primex.support'
                 artifactId = 'core-ktx'
                 version = '1.0.0'
             }

@@ -34,7 +34,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compiler_v
     }
     packagingOptions {
         resources {
@@ -46,11 +46,16 @@ android {
 
 dependencies {
     implementation project(path: ':core-ktx')
-    compileOnly 'androidx.recyclerview:recyclerview:1.2.1'
+    //compileOnly 'androidx.recyclerview:recyclerview:1.2.1'
     compileOnly "androidx.compose.foundation:foundation-layout:$compose_version"
     compileOnly "androidx.compose.ui:ui:$compose_version"
     compileOnly "androidx.compose.material:material:$compose_version"
     //compileOnly "androidx.compose.ui:ui:$compose_version"
+
+    // currently required for BottomSheetDialog
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation "androidx.compose.ui:ui-util:$compose_version"
+
 }
 
 // Because the components are created only during the afterEvaluate phase, you must
@@ -64,7 +69,7 @@ afterEvaluate {
                 from components.release
 
                 // You can then customize attributes of the publication as shown below.
-                groupId = 'com.primex.accomplice'
+                groupId = 'com.primex.support'
                 artifactId = 'compose-ui'
                 version = '1.0.0'
             }
