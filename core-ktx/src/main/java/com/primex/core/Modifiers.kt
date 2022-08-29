@@ -26,12 +26,16 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-private fun Modifier.gradient(
+
+/**
+ * Overlays the content with the gradient provided by the [Brush].
+ */
+inline fun Modifier.gradient(
     colors: List<Color>,
-    brushProvider: (List<Color>, Size) -> Brush
+    crossinline provider: (Size) -> Brush
 ): Modifier = composed {
     var size by rememberState(initial = Size.Zero)
-    val gradient = remember(colors, size) { brushProvider(colors, size) }
+    val gradient = remember(colors, size) { provider(size) }
     drawWithContent {
         size = this.size
         drawContent()
@@ -43,63 +47,57 @@ private fun Modifier.gradient(
  * Adds [gradient] over content.
  * [colors] determine top -> bottom or bottom -> top orientation.
  *
- * Note: default is with [Color.Black] and bottom -> top.
+ *  * Note: default is with [Color.Black] and bottom -> top.
+ * @param colors The colors of the [Brush]
+ * @param vertical is gradient vertical or horizontal.
  */
-fun Modifier.verticalGradient(
+fun Modifier.gradient(
     colors: List<Color> = listOf(
         Color.Transparent,
         Color.Black,
-    )
-) = gradient(colors) { gradientColors, size ->
-    Brush.verticalGradient(
-        colors = gradientColors,
-        startY = 0f,
-        endY = size.height
-    )
+    ),
+    vertical: Boolean = true,
+) = gradient(colors) { size ->
+    if (vertical)
+        Brush.verticalGradient(
+            colors = colors,
+            startY = 0f,
+            endY = size.height
+        )
+    else
+        Brush.horizontalGradient(
+            colors = colors,
+            startX = 0f,
+            endX = size.width
+        )
 }
-
-/**
- * @see [verticalGradient]
- */
-fun Modifier.horizontalGradient(
-    colors: List<Color> = listOf(
-        Color.Black,
-        Color.Transparent
-    )
-) = gradient(colors) { gradientColors, size ->
-    Brush.horizontalGradient(
-        colors = gradientColors,
-        startX = 0f,
-        endX = size.width
-    )
-}
-
 
 /**
  * @see [Brush.radialGradient]
  */
-fun Modifier.radialGradient(
+fun Modifier.gradient(
+    radius: Float,
     colors: List<Color> = listOf(
         Color.Transparent,
         Color.Black
     ),
     center: Offset = Offset.Unspecified,
-    radius: Float = Float.POSITIVE_INFINITY,
     tileMode: TileMode = TileMode.Clamp
-): Modifier = gradient(colors) { gradientColors, size ->
+) = gradient(colors) {
     Brush.radialGradient(
-        colors = gradientColors,
+        colors = colors,
         center = center,
-        radius = radius,
+        radius = radius.coerceAtLeast(1f),
         tileMode = tileMode
     )
 }
 
-
 /**
  * The utility function rotates transforms the composable to clockwise and anti-clockwise.
  */
-fun Modifier.rotate(clockwise: Boolean): Modifier {
+fun Modifier.rotate(
+    clockwise: Boolean
+): Modifier {
     val transform = Modifier.layout { measurable, constraints ->
         // as rotation is taking place
         // the height becomes so construct new set of construnts from old one.
@@ -160,7 +158,6 @@ fun Modifier.acquireFocusOnInteraction(
         )
         .then(this)
 }
-
 
 
 /**

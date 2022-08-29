@@ -1,7 +1,3 @@
-/**
- * Kanged from Android Open Source Dialog.kt
- */
-
 package com.primex.ui.dialog
 
 import android.annotation.SuppressLint
@@ -27,7 +23,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.primex.ui.DropdownMenu
 import java.util.*
+
 
 @ExperimentalComposeApi
 @Composable
@@ -45,7 +43,7 @@ fun BottomSheetDialog(
     val dialogId = rememberSaveable { UUID.randomUUID() }
 
     val bottomSheetDialog = remember {
-        BottomSheetDialogWrapper(
+        DialogWrapper(
             onDismissRequest = onDismissRequest,
             properties = properties,
             composeView = view,
@@ -54,7 +52,7 @@ fun BottomSheetDialog(
             dialogId = dialogId
         ).apply {
             setContent(composition) {
-                BottomSheetDialogLayout(
+                DialogLayout(
                     modifier = Modifier
                         .semantics { dialog() }
                     //.nestedScroll(nestedScrollConnection),
@@ -80,6 +78,8 @@ fun BottomSheetDialog(
             properties = properties,
             layoutDirection = layoutDirection,
         )
+
+        // FixMe: Don't know what is the best way to handle it.
         if (expanded)
             bottomSheetDialog.show()
         else
@@ -88,7 +88,7 @@ fun BottomSheetDialog(
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-private class BottomSheetDialogWrapper(
+private class DialogWrapper(
     private var onDismissRequest: () -> Unit,
     private var properties: DialogProperties,
     composeView: View,
@@ -97,7 +97,7 @@ private class BottomSheetDialogWrapper(
     dialogId: UUID
 ) : BottomSheetDialog(composeView.context), ViewRootForInspector {
 
-    private val bottomSheetDialogLayout: BottomSheetDialogLayout
+    private val bottomSheetDialogLayout: DialogLayout
 
     private val maxSupportedElevation = 30.dp
 
@@ -107,7 +107,7 @@ private class BottomSheetDialogWrapper(
         val window = window ?: error("Dialog has no window")
         window.requestFeature(Window.FEATURE_NO_TITLE)
         window.setBackgroundDrawableResource(android.R.color.transparent)
-        bottomSheetDialogLayout = BottomSheetDialogLayout(context, window).apply {
+        bottomSheetDialogLayout = DialogLayout(context, window).apply {
             tag = "BottomSheetDialog:$dialogId"
             clipChildren = false
             with(density) { elevation = maxSupportedElevation.toPx() }
@@ -115,7 +115,7 @@ private class BottomSheetDialogWrapper(
 
         fun ViewGroup.disableClipping() {
             clipChildren = false
-            if (this is BottomSheetDialogLayout) return
+            if (this is DialogLayout) return
             for (i in 0 until childCount) {
                 (getChildAt(i) as? ViewGroup)?.disableClipping()
             }
@@ -173,10 +173,8 @@ private class BottomSheetDialogWrapper(
     }
 }
 
-
-
 @SuppressLint("ViewConstructor")
-private class BottomSheetDialogLayout(
+private class DialogLayout(
     context: Context,
     override val window: Window
 ) : AbstractComposeView(context), DialogWindowProvider {
@@ -200,7 +198,7 @@ private class BottomSheetDialogLayout(
 }
 
 @Composable
-private fun BottomSheetDialogLayout(
+private fun DialogLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
