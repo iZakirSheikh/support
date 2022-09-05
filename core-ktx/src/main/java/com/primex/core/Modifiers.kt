@@ -52,11 +52,11 @@ inline fun Modifier.gradient(
  * @param vertical is gradient vertical or horizontal.
  */
 fun Modifier.gradient(
+    vertical: Boolean,
     colors: List<Color> = listOf(
         Color.Transparent,
         Color.Black,
     ),
-    vertical: Boolean = true,
 ) = gradient(colors) { size ->
     if (vertical)
         Brush.verticalGradient(

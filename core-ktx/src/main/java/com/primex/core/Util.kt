@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
+import android.view.Window
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.ColorUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -31,12 +33,20 @@ fun <T> rememberState(initial: T): MutableState<T> = remember {
 /**
  * A utility to get/find host activity
  */
-val Context.activity: Activity?
-    get() = when (this) {
+val Context.activity: Activity get() = findActivity()
+
+/**
+ * A Utility function that finds and returns the [Activity] within [Context]
+ */
+private tailrec fun Context.findActivity(): Activity =
+    when (this) {
         is Activity -> this
-        is ContextWrapper -> baseContext.activity
-        else -> null
+        is ContextWrapper -> this.baseContext.findActivity()
+        else -> throw IllegalStateException(
+            "Context is not an Activity context, but a ${javaClass.simpleName} context. "
+        )
     }
+
 
 /**
  * Request screen [orientation]
