@@ -36,6 +36,8 @@ private val PaddingLarge = 32.dp
 
 private val DialogMinHeight = 100.dp
 
+
+@Deprecated("Use Dialog from android instead.")
 @Composable
 fun BaseDialog(
     title: String,
@@ -132,6 +134,8 @@ private val defaultSizeModifier = Modifier
         maxWidth = 130.dp,
     )
 
+
+@Deprecated("Use Dialog from android instead.")
 @Composable
 fun PrimeDialog(
     title: String,
@@ -193,6 +197,8 @@ fun PrimeDialog(
     )
 }
 
+
+@Deprecated("Use Dialog from android instead.")
 @Composable
 fun AlertDialog(
     title: String,

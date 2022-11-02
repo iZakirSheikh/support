@@ -39,6 +39,7 @@ private class LocalAdapter<T>(
 /**
  * @exception NoSuchMethodError if [androidx.recyclerview:recyclerview:1.2.1] not available.
  */
+@Deprecated("use LazyColumn instead; because that is now matured enough.")
 @Composable
 fun <T> Recycler(
     modifier: Modifier = Modifier,

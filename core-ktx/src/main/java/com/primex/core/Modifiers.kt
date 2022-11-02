@@ -8,6 +8,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -255,3 +257,18 @@ fun Modifier.drawVerticalDivider(
         end = end
     )
 }
+
+
+/**
+ * A utility [Modifier]
+ */
+@Stable
+fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
+    this.then(
+        Modifier.padding(
+            start = horizontal,
+            end = horizontal,
+            top = top,
+            bottom = bottom
+        )
+    )

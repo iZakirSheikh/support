@@ -26,6 +26,7 @@ private val defaultSizeModifier = Modifier
 @JvmName("DropdownMenu1")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
+@Deprecated("Use the android's default one.")
 fun DropdownMenu(
     title: String? = null,
     checked: Int = -1,
@@ -49,7 +50,7 @@ fun DropdownMenu(
     )
 }
 
-
+@Deprecated("Use the android's default one.")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DropdownMenu(
