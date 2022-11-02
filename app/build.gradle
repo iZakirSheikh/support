@@ -32,7 +32,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
         /*  useIR = true*/
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-Xuse-k2", "-Xjdk-release=1.8"]
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn",/* "-Xuse-k2", "-Xjdk-release=1.8"*/]
     }
     buildFeatures {
         compose true
