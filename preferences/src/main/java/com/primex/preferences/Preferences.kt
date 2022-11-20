@@ -3,13 +3,10 @@ package com.primex.preferences
 import android.app.Application
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import androidx.datastore.preferences.core.*
+import com.primex.preferences.Key.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import androidx.datastore.preferences.core.Preferences as StorePreference
@@ -17,208 +14,73 @@ import androidx.datastore.preferences.core.Preferences as StorePreference
 internal typealias StoreKey<T> = StorePreference.Key<T>
 
 /**
- * The [Key]
- */
-data class Key<T> internal constructor(internal val storeKey: StoreKey<T>) {
-    @JvmField
-    val name = storeKey.name
-}
-
-/**
- * [Key] with default value
- */
-data class Key1<T> internal constructor(
-    internal val storeKey: StoreKey<T>,
-    internal val default: T
-) {
-    @JvmField
-    val name = storeKey.name
-}
-
-/**
- * [Key] with [Saver]
- */
-data class Key2<T, O> internal constructor(
-    internal val storeKey: StoreKey<T>,
-    internal val saver: Saver<O, T>
-) {
-    @JvmField
-    val name = storeKey.name
-}
-
-/**
- * [Key] with default value and [Saver]
- */
-data class Key3<T, O> internal constructor(
-    internal val storeKey: StoreKey<T>,
-    internal val default: O,
-    internal val saver: Saver<O, T>
-) {
-    @JvmField
-    val name = storeKey.name
-}
-
-/**
  * The [Saver] describes how the object of [Original] class can be simplified and converted into
  * something which is [Saveable].
  */
-interface Saver<Original, Saveable> {
+interface Saver<S, O> {
     /**
      * Convert the value into a saveable one.
      */
-    fun save(value: Original): Saveable
+    fun save(value: O): S
 
     /**
      * Convert the restored value back to the original Class.
      */
-    fun restore(value: Saveable): Original
+    fun restore(value: S): O
 }
 
-/**
- * Saves value to/from original.
- */
-typealias IntSaver<O> = Saver<O, Int>
+sealed interface Key {
 
-fun intPreferenceKey(name: String): Key<Int> = Key(intPreferencesKey(name))
-
-fun intPreferenceKey(name: String, defaultValue: Int): Key1<Int> =
-    Key1(intPreferencesKey(name), defaultValue)
+    /**
+     * The name of the key.
+     */
+    val name: String
 
 
-fun <O> intPreferenceKey(name: String, saver: IntSaver<O>) =
-    Key2(intPreferencesKey(name), saver)
+    /**
+     * Represents the basic [StoreKey]
+     */
+    @JvmInline
+    value class Key1<S> internal constructor(internal val value: StoreKey<S>) : Key {
+        override val name: String
+            get() = value.name
+    }
 
-fun <O> intPreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: IntSaver<O>
-) = Key3(
-    intPreferencesKey(name),
-    defaultValue,
-    saver
-)
+    /**
+     * Represents  akey with default value.
+     */
+    data class Key2<S> internal constructor(
+        internal val value: StoreKey<S>,
+        internal val default: S
+    ) : Key {
+        override val name: String
+            get() = value.name
+    }
 
-/**
- * Maps value to/from [Double]
- */
-typealias DoubleSaver<O> = Saver<O, Double>
+    /**
+     * [Key] with [Saver]
+     */
+    data class Key3<S, O> internal constructor(
+        internal val value: StoreKey<S>,
+        internal val saver: Saver<S, O>
+    ) : Key {
+        override val name: String
+            get() = value.name
+    }
 
-fun doublePreferenceKey(name: String): Key<Double> = Key(doublePreferencesKey(name))
+    /**
+     * [Key] with [Saver] and [default] value.
+     */
+    data class Key4<S, O> internal constructor(
+        internal val value: StoreKey<S>,
+        internal val default: O,
+        internal val saver: Saver<S, O>
+    ) : Key {
+        override val name: String
+            get() = value.name
+    }
+}
 
-fun doublePreferenceKey(name: String, defaultValue: Double): Key1<Double> =
-    Key1(doublePreferencesKey(name), defaultValue)
-
-fun <O> doublePreferenceKey(name: String, saver: DoubleSaver<O>) =
-    Key2(doublePreferencesKey(name), saver)
-
-fun <O> doublePreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: DoubleSaver<O>
-) = Key3(
-    doublePreferencesKey(name),
-    defaultValue,
-    saver
-)
-
-
-/**
- * Maps value to/from [Float].
- */
-typealias FloatSaver<O> = Saver<O, Float>
-
-fun floatPreferenceKey(name: String): Key<Float> = Key(floatPreferencesKey(name))
-
-fun floatPreferenceKey(name: String, defaultValue: Float): Key1<Float> =
-    Key1(floatPreferencesKey(name), defaultValue)
-
-fun <O> floatPreferenceKey(name: String, saver: FloatSaver<O>) =
-    Key2(floatPreferencesKey(name), saver)
-
-fun <O> floatPreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: FloatSaver<O>
-) = Key3(
-    floatPreferencesKey(name),
-    defaultValue,
-    saver
-)
-
-/**
- * Maps value to/from [Long].
- */
-typealias LongSaver<O> = Saver<O, Long>
-
-fun longPreferenceKey(name: String): Key<Long> = Key(longPreferencesKey(name))
-
-fun longPreferenceKey(name: String, defaultValue: Long): Key1<Long> =
-    Key1(longPreferencesKey(name), defaultValue)
-
-fun <O> longPreferenceKey(name: String, saver: LongSaver<O>) =
-    Key2(longPreferencesKey(name), saver)
-
-fun <O> longPreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: LongSaver<O>
-) = Key3(
-    longPreferencesKey(name),
-    defaultValue,
-    saver
-)
-
-/**
- * Maps value to/from [Boolean].
- */
-typealias BooleanSaver<O> = Saver<O, Boolean>
-
-fun booleanPreferenceKey(name: String): Key<Boolean> = Key(booleanPreferencesKey(name))
-
-fun booleanPreferenceKey(name: String, defaultValue: Boolean): Key1<Boolean> =
-    Key1(booleanPreferencesKey(name), defaultValue)
-
-fun <O> booleanPreferenceKey(name: String, saver: BooleanSaver<O>) =
-    Key2(booleanPreferencesKey(name), saver)
-
-fun <O> booleanPreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: BooleanSaver<O>
-) = Key3(
-    booleanPreferencesKey(name),
-    defaultValue,
-    saver
-)
-
-/**
- * Maps value to/from [String].
- */
-typealias StringSaver<O> = Saver<O, String>
-
-fun stringPreferenceKey(name: String): Key<String> = Key(stringPreferencesKey(name))
-
-fun stringPreferenceKey(name: String, defaultValue: String): Key1<String> =
-    Key1(stringPreferencesKey(name), defaultValue)
-
-fun <O> stringPreferenceKey(name: String, saver: StringSaver<O>) =
-    Key2(stringPreferencesKey(name), saver)
-
-fun <O> stringPreferenceKey(
-    name: String,
-    defaultValue: O,
-    saver: StringSaver<O>
-) = Key3(
-    stringPreferencesKey(name),
-    defaultValue,
-    saver
-)
-
-///String set
-fun stringSetPreferenceKey(name: String) = Key(stringSetPreferencesKey(name))
-
-fun stringSetPreferenceKey(name: String, defaultValue: Set<String>): Key1<Set<String>> =
-    Key1(stringSetPreferencesKey(name), defaultValue)
 
 interface Preferences {
 
@@ -227,66 +89,51 @@ interface Preferences {
      *
      * Note: This can be nullable if [key] doesn't exist.
      */
-    operator fun <T> get(key: Key<T>): Flow<T?>
+    fun <S> observe(key: Key1<S>): Flow<S?>
 
     /**
-     * Note: emits [defaultValue] if orginal not exists.
-     * @see get
+     * Note: emits [default] if original not exists.
+     * @see observe
      */
-    operator fun <T> get(key: Key1<T>): Flow<T>
+    fun <S> observe(key: Key2<S>): Flow<S>
 
     /**
      * [Flow] of type Any Type.
      *
-     * The key contains [TwoWayConverter], which helps in conversion from [O] Original to Savable
+     * The key contains [Saver], which helps in conversion from [O] Original to Savable
      * Note: Savable are of Type ([String], [Float], [Double], [Int], [Long], String [Set]).
      * This can be nullable if [key] doesn't exist.
      */
-    operator fun <T, O> get(key: Key2<T, O>): Flow<O?>
+    fun <S, O> observe(key: Key3<S, O>): Flow<O?>
 
     /**
      * **Note returns defaultValue if null**
      *
-     * @see get
+     * @see observe
      */
-    operator fun <T, O> get(key: Key3<T, O>): Flow<O>
-
-    // Mutating methods below:
+    fun <S, O> observe(key: Key4<S, O>): Flow<O>
 
     /**
      * Set a key value pair in MutablePreferences.
-     *
-     * Example usage:
-     * val COUNTER_KEY = intPreferencesKey("counter")
-     *
-     * // Once edit completes successfully, preferenceStore will contain the incremented counter.
-     * preferenceStore.edit { prefs: MutablePreferences ->
-     *   prefs\[COUNTER_KEY\] = prefs\[COUNTER_KEY\] :? 0 + 1
-     * }
-     *
-     * @param key the preference to set
-     * @param key the value to set the preference to
      */
-    operator fun <T> set(key: Key<T>, value: T)
+    operator fun <S> set(key: Key1<S>, value: S)
 
     /**
      * @see [set]
      */
-    operator fun <T> set(key: Key1<T>, value: T)
+    operator fun <S> set(key: Key2<S>, value: S)
 
     /**
      * @see [set]
      */
-    operator fun <T, O> set(key: Key2<T, O>, value: O)
+    operator fun <S, O> set(key: Key3<S, O>, value: O)
 
     /**
      * @see [set]
      */
-    operator fun <T, O> set(key: Key3<T, O>, value: O)
+    operator fun <S, O> set(key: Key4<S, O>, value: O)
 
-
-    /**
-     * Removes the preference with the given key from this MutablePreferences. If this
+    /** Removes the preference with the given key from this MutablePreferences. If this
      * Preferences does not contain the key, this is a no-op.
      *
      * Example usage:
@@ -294,14 +141,7 @@ interface Preferences {
      *
      * @param key the key to remove from this MutablePreferences
      */
-    operator fun <T> minusAssign(key: Key<T>)
-
-    operator fun <T> minusAssign(key: Key1<T>)
-
-    operator fun <T, O> minusAssign(key: Key2<T, O>)
-
-    operator fun <T, O> minusAssign(key: Key3<T, O>)
-
+    operator fun minusAssign(key: Key)
 
     /**
      * Returns true if this Preferences contains the specified key.
@@ -309,35 +149,23 @@ interface Preferences {
      * @param key the key to check for
      */
     @WorkerThread
-    operator fun <T> contains(key: Key<T>): Boolean
+    operator fun contains(key: Key): Boolean
 
-    operator fun <T> contains(key: Key1<T>): Boolean
-
-    operator fun <T, O> contains(key: Key2<T, O>): Boolean
-
-    operator fun <T, O> contains(key: Key3<T, O>): Boolean
-
+    /** Removes all preferences from this MutablePreferences. */
+    fun clear(x: MutablePreferences)
 
     /**
-     * Collects blocking [runBlocking] the [Flow.first] emitted by [Flow].
-     *
-     * * Note: The terminal operator that returns the first element emitted by the flow and then cancels flow's collection.*
+     * Remove a preferences from this MutablePreferences.
      */
-    fun <T> Flow<T>.obtain(): T = runBlocking { first() }
-
-    /**
-     * [collectAsState()]
-     * requires
-     * @exception NoSuchMethodError if dependency [androidx.compose.runtime] not found.
-     */
-    @Composable
-    fun <T> Flow<T>.observeAsState() = collectAsState(initial = obtain())
+    fun remove(key: Key)
 
     companion object {
 
         // Singleton prevents multiple instances of repository opening at the
         // same time.
         private const val TAG = "Preferences"
+
+        private const val DEFAULT_NAME = "Shared_Preferences"
 
         @Volatile
         private var INSTANCE: Preferences? = null
@@ -348,22 +176,263 @@ interface Preferences {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the repository
             return INSTANCE ?: synchronized(this) {
-                val instance = PreferencesImpl(context.applicationContext as Application)
+                val instance =
+                    PreferencesImpl(context.applicationContext as Application, DEFAULT_NAME)
                 INSTANCE = instance
                 instance
             }
         }
+
+        operator fun invoke(context: Context, name: String = DEFAULT_NAME): Preferences =
+            PreferencesImpl(context.applicationContext, name)
     }
 }
 
+/**
+ * Collects blocking [runBlocking] the [Flow.first] emitted by [Flow].
+ * * Note: The terminal operator that returns the first element emitted by the flow and then cancels flow's collection.
+ */
+inline fun <S> Preferences.value(key: Key1<S>) =
+    runBlocking { observe(key).first() }
+
+inline fun <S> Preferences.value(key: Key2<S>) =
+    runBlocking { observe(key).first() }
+
+inline fun <S, O> Preferences.value(key: Key3<S, O>) =
+    runBlocking { observe(key).first() }
+
+inline fun <S, O> Preferences.value(key: Key4<S, O>) =
+    runBlocking { observe(key).first() }
+
+@Composable
+inline operator fun <S> Preferences.get(key: Key1<S>) =
+    observe(key).collectAsState(initial = value(key))
+
+@Composable
+inline operator fun <S> Preferences.get(key: Key2<S>) =
+    observe(key).collectAsState(initial = value(key))
+
+@Composable
+inline operator fun <S, O> Preferences.get(key: Key3<S, O>) =
+    observe(key).collectAsState(initial = value(key))
+
+@Composable
+inline operator fun <S, O> Preferences.get(key: Key4<S, O>) =
+    observe(key).collectAsState(initial = value(key))
 
 /**
- * Builds the instance of The preference data store.
+ * Saves value to/from original.
  */
-fun Preferences(context: Context): Preferences =
-    PreferencesImpl(context.applicationContext as Application)
+typealias IntSaver<O> = Saver<Int, O>
+
+/**
+ * @see [intPreferencesKey]
+ */
+fun intPreferenceKey(name: String) = Key1(intPreferencesKey(name))
+
+/**
+ * @see [intPreferencesKey]
+ */
+fun intPreferenceKey(name: String, defaultValue: Int): Key2<Int> =
+    Key2(intPreferencesKey(name), defaultValue)
+
+/**
+ * @see [intPreferencesKey]
+ */
+fun <O> intPreferenceKey(name: String, saver: IntSaver<O>) =
+    Key3(intPreferencesKey(name), saver)
+
+/**
+ * @see [intPreferencesKey]
+ */
+fun <O> intPreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: IntSaver<O>
+) = Key4(
+    intPreferencesKey(name),
+    defaultValue,
+    saver
+)
+
+/**
+ * Saves value to/from original.
+ */
+typealias DoubleSaver<O> = Saver<Double, O>
+
+/**
+ * @see [doublePreferencesKey]
+ */
+fun doublePreferenceKey(name: String) = Key1(doublePreferencesKey(name))
+
+/**
+ * @see [doublePreferencesKey]
+ */
+fun doublePreferenceKey(name: String, defaultValue: Double): Key2<Double> =
+    Key2(doublePreferencesKey(name), defaultValue)
+
+/**
+ * @see [doublePreferencesKey]
+ */
+fun <O> doublePreferenceKey(name: String, saver: DoubleSaver<O>) =
+    Key3(doublePreferencesKey(name), saver)
+
+/**
+ * @see [doublePreferencesKey]
+ */
+fun <O> doublePreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: DoubleSaver<O>
+) = Key4(
+    doublePreferencesKey(name),
+    defaultValue,
+    saver
+)
 
 
-val LocalPreferenceStore = compositionLocalOf<Preferences> {
+/**
+ * Saves value to/from original.
+ */
+typealias FloatSaver<O> = Saver<Float, O>
+
+/**
+ * @see [floatPreferencesKey]
+ */
+fun floatPreferenceKey(name: String) = Key1(floatPreferencesKey(name))
+
+/**
+ * @see [floatPreferencesKey]
+ */
+fun floatPreferenceKey(name: String, defaultValue: Float): Key2<Float> =
+    Key2(floatPreferencesKey(name), defaultValue)
+
+/**
+ * @see [floatPreferencesKey]
+ */
+fun <O> floatPreferenceKey(name: String, saver: FloatSaver<O>) =
+    Key3(floatPreferencesKey(name), saver)
+
+/**
+ * @see [floatPreferencesKey]
+ */
+fun <O> floatPreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: FloatSaver<O>
+) = Key4(
+    floatPreferencesKey(name),
+    defaultValue,
+    saver
+)
+
+
+/**
+ * Saves value to/from original.
+ */
+typealias LongSaver<O> = Saver<Long, O>
+
+/**
+ * @see [longPreferencesKey]
+ */
+fun longPreferenceKey(name: String) = Key1(longPreferencesKey(name))
+
+/**
+ * @see [longPreferencesKey]
+ */
+fun longPreferenceKey(name: String, defaultValue: Long): Key2<Long> =
+    Key2(longPreferencesKey(name), defaultValue)
+
+/**
+ * @see [longPreferencesKey]
+ */
+fun <O> longPreferenceKey(name: String, saver: LongSaver<O>) =
+    Key3(longPreferencesKey(name), saver)
+
+/**
+ * @see [longPreferencesKey]
+ */
+fun <O> longPreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: LongSaver<O>
+) = Key4(
+    longPreferencesKey(name),
+    defaultValue,
+    saver
+)
+
+typealias BooleanSaver<O> = Saver<Boolean, O>
+
+/**
+ * @see [booleanPreferencesKey]
+ */
+fun booleanPreferenceKey(name: String) = Key1(booleanPreferencesKey(name))
+
+/**
+ * @see [booleanPreferencesKey]
+ */
+fun booleanPreferenceKey(name: String, defaultValue: Boolean): Key2<Boolean> =
+    Key2(booleanPreferencesKey(name), defaultValue)
+
+/**
+ * @see [booleanPreferencesKey]
+ */
+fun <O> booleanPreferenceKey(name: String, saver: BooleanSaver<O>) =
+    Key3(booleanPreferencesKey(name), saver)
+
+/**
+ * @see [booleanPreferencesKey]
+ */
+fun <O> booleanPreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: BooleanSaver<O>
+) = Key4(
+    booleanPreferencesKey(name),
+    defaultValue,
+    saver
+)
+
+typealias StringSaver<O> = Saver<String, O>
+
+/**
+ * @see [stringPreferencesKey]
+ */
+fun stringPreferenceKey(name: String) =
+    Key1(stringPreferencesKey(name))
+
+/**
+ * @see [stringPreferencesKey]
+ */
+fun stringPreferenceKey(name: String, defaultValue: String): Key2<String> =
+    Key2(stringPreferencesKey(name), defaultValue)
+
+/**
+ * @see [stringPreferencesKey]
+ */
+fun <O> stringPreferenceKey(name: String, saver: StringSaver<O>) =
+    Key3(stringPreferencesKey(name), saver)
+
+/**
+ * @see [stringPreferencesKey]
+ */
+fun <O> stringPreferenceKey(
+    name: String,
+    defaultValue: O,
+    saver: StringSaver<O>
+) = Key4(
+    stringPreferencesKey(name),
+    defaultValue,
+    saver
+)
+
+///String set
+fun stringSetPreferenceKey(name: String) = Key1(stringSetPreferencesKey(name))
+
+fun stringSetPreferenceKey(name: String, defaultValue: Set<String>) =
+    Key2(stringSetPreferencesKey(name), defaultValue)
+
+val LocalPreferenceStore = staticCompositionLocalOf<Preferences> {
     error("No Preferences Store provided.")
 }
