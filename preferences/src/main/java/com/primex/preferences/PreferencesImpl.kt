@@ -2,12 +2,14 @@ package com.primex.preferences
 
 import android.content.Context
 import android.util.Log
+import androidx.datastore.preferences.PreferencesProto.StringSet
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.primex.preferences.*
 import com.primex.preferences.Key.Key1
+import com.primex.preferences.Key.Key2
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -17,6 +19,7 @@ private const val TAG = "Preferences"
 
 
 internal class PreferencesImpl(context: Context, name: String) : Preferences {
+
     /**
      * As this instance has a lifespan of [Application], hence using [GlobalScope] is no issue.
      */
@@ -35,46 +38,37 @@ internal class PreferencesImpl(context: Context, name: String) : Preferences {
         }
     }
 
-    override fun <S> observe(key: Key1<S>): Flow<S?> =
-        flow.map { preferences -> preferences[key.value] }
 
-    override fun <S> observe(key: Key.Key2<S>): Flow<S> =
-        flow.map { preferences ->
-            preferences[key.value] ?: key.default
+    override fun <S, O> get(key: Key1<S, O>): Flow<O?> {
+        return flow.map { preferences ->
+            if (key.saver == null) // must not be null if not provided values.
+                preferences[key.value] as O // possible only if basic values.
+            else
+                preferences[key.value]?.let { key.saver.restore(it) }
         }
+    }
 
-    override fun <S, O> observe(key: Key.Key3<S, O>): Flow<O?> =
-        flow.map { preferences ->
-            // return restored value
-            preferences[key.value]?.let { key.saver.restore(it) }
+    override fun <S, O> get(key: Key2<S, O>): Flow<O> {
+        return flow.map { preferences ->
+            if (key.saver == null) // must not be null if not provided values.
+                (preferences[key.value] ?: key.default) as O // possible only if basic values.
+            else
+                preferences[key.value]?.let { key.saver.restore(it) } ?: key.default
         }
+    }
 
-    override fun <S, O> observe(key: Key.Key4<S, O>): Flow<O> =
-        flow.map { preferences ->
-            // return restored or default.
-            preferences[key.value]?.let { key.saver.restore(it) } ?: key.default
-        }
-
-    private fun <T> set(key: StoreKey<T>, value: T) {
+    override fun <S, O> set(key: Key<S, O>, value: O) {
         scope.launch {
             store.edit {
-                it[key] = value
+                val saver = key.saver
+                // if saver is null in that case the savable value is simple like int.
+                // else use saver to save the value.
+                it[key.storeKey] = if (saver == null) (value as S) else saver.save(value)
             }
         }
     }
 
-    override fun <S> set(key: Key1<S>, value: S) = set(key.value, value)
-
-    override fun <S> set(key: Key.Key2<S>, value: S) =
-        set(key.value, value)
-
-    override fun <S, O> set(key: Key.Key3<S, O>, value: O) =
-        set(key.value, key.saver.save(value))
-
-    override fun <S, O> set(key: Key.Key4<S, O>, value: O) =
-        set(key.value, key.saver.save(value))
-
-    override fun minusAssign(key: Key) {
+    override fun minusAssign(key: Key<*, *>) {
         scope.launch {
             store.edit {
                 it -= key.storeKey
@@ -82,7 +76,7 @@ internal class PreferencesImpl(context: Context, name: String) : Preferences {
         }
     }
 
-    override fun contains(key: Key): Boolean {
+    override fun contains(key: Key<*, *>): Boolean {
         return runBlocking {
             flow.map { preference -> key.storeKey in preference }.first()
         }
@@ -96,7 +90,7 @@ internal class PreferencesImpl(context: Context, name: String) : Preferences {
         }
     }
 
-    override fun remove(key: Key) {
+    override fun remove(key: Key<*, *>) {
         scope.launch {
             store.edit {
                 it.remove(key.storeKey)
@@ -105,10 +99,14 @@ internal class PreferencesImpl(context: Context, name: String) : Preferences {
     }
 }
 
-private inline val Key.storeKey
-    inline get() = when (this) {
-        is Key1<*> -> value
-        is Key.Key2<*> -> value
-        is Key.Key3<*, *> -> value
-        is Key.Key4<*, *> -> value
-    }
+
+
+private inline  val <S, O> Key<S, O>.storeKey get() = when(this){
+    is Key1 -> value
+    is Key2 -> value
+}
+
+private inline val <S, O> Key<S, O>.saver: Saver<S, O>? get() = when(this){
+    is Key1 -> saver
+    is Key2 -> saver
+}

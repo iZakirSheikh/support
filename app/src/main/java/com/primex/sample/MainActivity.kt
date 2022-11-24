@@ -6,37 +6,40 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import com.primex.preferences.IntSaver
-import com.primex.preferences.Preferences
-import com.primex.preferences.get
-import com.primex.preferences.intPreferenceKey
+import com.primex.preferences.*
 import com.primex.sample.ui.theme.SampleTheme
 import com.primex.ui.Button
 import com.primex.ui.Preference
 import com.primex.ui.SliderPreference
+import com.primex.ui.activity
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.EmptyCoroutineContext
 
 
 private val KEY_COUNTER =
-    intPreferenceKey("counter3", defaultValue = true, saver = object : IntSaver<Boolean> {
+    intPreferenceKey("Counter3", false, object : IntSaver<Boolean>{
         override fun save(value: Boolean): Int = if (value) 1 else 0
 
-        override fun restore(value: Int): Boolean = value != 0
+        override fun restore(value: Int): Boolean = value == 1
     })
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var preferences: Preferences
+    lateinit var preferences: Preferences
 
     @OptIn(ExperimentalComposeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +49,12 @@ class MainActivity : ComponentActivity() {
             SampleTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
 
-                    val counter by preferences[KEY_COUNTER]
+                    val counter by preferences.observeAsState(key = KEY_COUNTER)
 
                     Button(label = "$counter", onClick = {
                         preferences[KEY_COUNTER] = !counter
                     })
+
 
                 }
             }
@@ -71,6 +75,28 @@ fun DefaultPreview() {
 
     SampleTheme {
         PreviewPerf()
+    }
+}
+
+@Composable
+@NonRestartableComposable
+fun <S, O> preference(key: Key<S, O>): State<O?> {
+    val activity = LocalContext.activity
+    require(activity is MainActivity)
+    val preferences =activity.preferences
+    val flow = when(key){
+        is Key.Key1 -> preferences[key]
+        is Key.Key2 -> preferences[key]
+    }
+
+    val first = remember(key.name) {
+        runBlocking { flow.first() }
+    }
+
+    return produceState(first, flow, EmptyCoroutineContext){
+        flow.collectLatest {
+            value = it
+        }
     }
 }
 
