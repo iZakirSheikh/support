@@ -323,3 +323,16 @@ fun <S, O> Preferences.observeAsState(key: Key1<S, O>): State<O?> = observe(key 
 @NonRestartableComposable
 fun <S, O> Preferences.observeAsState(key: Key2<S, O>): State<O> = observe(key = key) as State<O>
 
+
+/**
+ * @return the raw value from the [Preferences] linked with [key]
+ */
+@WorkerThread
+fun <S, O> Preferences.value(key: Key1<S, O>): O? = runBlocking { this@value[key].first() }
+
+/**
+ * @see [value]
+ */
+@WorkerThread
+fun <S, O> Preferences.value(key: Key2<S, O>): O = runBlocking { this@value[key].first() }
+
