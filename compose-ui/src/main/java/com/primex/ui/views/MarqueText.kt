@@ -6,6 +6,9 @@ import android.graphics.Typeface
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
@@ -59,7 +62,6 @@ fun MarqueText(
     typeface: Typeface = Typeface.DEFAULT,
 ) {
     val fadingEdgeLengthPx = with(LocalDensity.current) { fadingEdgeLength.toPx() }
-
     AndroidView(
         modifier = modifier,
         factory = { context ->
@@ -75,11 +77,24 @@ fun MarqueText(
                 this.marqueeRepeatLimit = marqueeRepeatLimit
                 if (fadeEdge)
                     isHorizontalFadingEdgeEnabled = true
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
             }
-        }) {
-        it.setTextColor(textColor.toArgb())
-        it.text = text
-    }
+        },
+        update = {
+            it.setTextColor(textColor.toArgb())
+            it.text = text
+            it.textSize = textSize.value
+            it.setTextColor(textColor.toArgb())
+            it.ellipsize = TextUtils.TruncateAt.MARQUEE
+            it.setFadingEdgeLength(fadingEdgeLengthPx.toInt())
+            it.maxLines = 1
+            it.isSingleLine = true
+            it.typeface = typeface
+            it.marqueeRepeatLimit = marqueeRepeatLimit
+            if (fadeEdge)
+                it.isHorizontalFadingEdgeEnabled = true
+        }
+    )
 }
 
 
