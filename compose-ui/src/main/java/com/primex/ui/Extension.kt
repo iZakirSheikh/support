@@ -58,6 +58,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.primex.ui.Label
 import com.primex.ui.Placeholder
 import com.primex.core.Result
+import com.primex.ui.dialog.BottomSheetDialogProperties
 
 @NonRestartableComposable
 @Composable
@@ -652,5 +653,21 @@ inline fun Dialog(
             onDismissRequest = onDismissRequest,
             properties = properties,
             content = content
+        )
+}
+
+
+@Composable
+inline fun BottomSheetDialog(
+    expanded: Boolean,
+    noinline onDismissRequest: () -> Unit,
+    properties: BottomSheetDialogProperties = BottomSheetDialogProperties(dismissWithAnimation = true),
+    noinline content: @Composable () -> Unit
+){
+    if (expanded)
+        com.primex.ui.dialog.BottomSheetDialog(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            content = content,
         )
 }

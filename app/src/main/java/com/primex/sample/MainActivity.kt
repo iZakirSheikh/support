@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LocalAbsoluteElevation
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -20,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
+import com.primex.core.rememberState
 import com.primex.preferences.*
 import com.primex.sample.ui.theme.SampleTheme
 import com.primex.ui.*
+import com.primex.ui.dialog.BottomSheetDialog
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -49,14 +52,21 @@ class MainActivity : ComponentActivity() {
             SampleTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
 
-                    /* val counter by preferences.observeAsState(key = KEY_COUNTER)
+                    var s by rememberState(initial = false)
 
-                     Button(label = "$counter", onClick = {
-                         preferences[KEY_COUNTER] = !counter
+                     Button(label = "click", onClick = {
+                         s = !s
                      })
- */
 
-                    PreviewPerf()
+                    com.primex.ui.BottomSheetDialog(expanded = s, onDismissRequest = { s= false }) {
+                        Surface() {
+                            Column() {
+                                repeat(10){
+                                    Label(text = "Label $it")
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
