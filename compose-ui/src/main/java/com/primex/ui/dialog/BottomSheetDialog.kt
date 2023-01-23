@@ -251,8 +251,8 @@ private val BlackScrimmed: (Color) -> Color = { original ->
  * @param properties [BottomSheetDialogProperties] for further customization of this dialog's behavior.
  * @param content The content to be displayed inside the dialog.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
+@ExperimentalComposeUiApi
 fun BottomSheetDialog(
     onDismissRequest: () -> Unit,
     properties: BottomSheetDialogProperties = BottomSheetDialogProperties(),

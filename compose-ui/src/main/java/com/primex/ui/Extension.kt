@@ -49,6 +49,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -658,6 +659,7 @@ inline fun Dialog(
 
 
 @Composable
+@ExperimentalComposeUiApi
 inline fun BottomSheetDialog(
     expanded: Boolean,
     noinline onDismissRequest: () -> Unit,
