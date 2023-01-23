@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
     lateinit var preferences: Preferences
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalComposeApi::class, ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferences = Preferences(this)
